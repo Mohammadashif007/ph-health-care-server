@@ -3,6 +3,8 @@ import { prisma } from "../../../libs/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { generateToken } from "../../helper/jwtHelper";
+import { AppError } from "../../errors/AppError";
+import httpStatus from "http-status";
 
 const loginUserIntoDB = async (payload: {
     email: string;
@@ -11,12 +13,14 @@ const loginUserIntoDB = async (payload: {
     const isUserExist = await prisma.user.findUniqueOrThrow({
         where: { email: payload.email, status: UserStatus.ACTIVE },
     });
+
     const isCorrectPassword = await bcrypt.compare(
         payload.password,
         isUserExist.password
     );
     if (!isCorrectPassword) {
-        throw new Error("Password dose not match");
+        console.log("password");
+        throw new AppError(httpStatus.BAD_REQUEST, "Password dose not match");
     }
     const accessToke = generateToken(
         {
