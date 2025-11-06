@@ -1,8 +1,9 @@
-import express, { Application, NextFunction, Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
-import { UserRoutes } from "./app/modules/user/user.router";
+import cookieParser from "cookie-parser";
+import router from "./app/routes";
 
 const app: Application = express();
 app.use(
@@ -15,6 +16,7 @@ app.use(
 //parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get("/", (req: Request, res: Response) => {
     res.send({
@@ -22,7 +24,7 @@ app.get("/", (req: Request, res: Response) => {
     });
 });
 
-app.use("/api/v1/user", UserRoutes);
+app.use("/api/v1", router);
 
 app.use(globalErrorHandler);
 
